@@ -596,12 +596,12 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
     }
 
     @ReactMethod
-    public void transceive(ReadableArray rnArray, Callback callback) {
+    public void transceive(String command, Callback callback) {
         synchronized(this) {
             if (techRequest != null) {
                 try {
                     String tech = techRequest.getTechType();
-                    byte[] bytes = rnArrayToBytes(rnArray);
+                    byte[] bytes = hexStringToByteArray(command);
 
                     TagTechnology baseTechHandle = techRequest.getTechHandle();
                     // TagTechnology is the base class for each tech (ex, NfcA, NfcB, IsoDep ...)
@@ -1247,6 +1247,15 @@ class NfcManager extends ReactContextBaseJavaModule implements ActivityEventList
             value.pushInt((bytes[i] & 0xFF));
         }
         return value;
+    }
+    private byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len/2];
+
+        for(int i = 0; i < len; i+=2){
+            data[i/2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
     }
 }
 
