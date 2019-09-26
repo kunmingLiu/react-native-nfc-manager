@@ -12,6 +12,18 @@ declare module 'react-native-nfc-manager' {
 		payload: any[];
 	}
 
+	export enum NfcTech {
+		Ndef = 'Ndef',
+		NfcA = 'NfcA',
+		NfcB = 'NfcB',
+		NfcF = 'NfcF',
+		NfcV = 'NfcV',
+		IsoDep = 'IsoDep',
+		MifareClassic = 'MifareClassic',
+		MifareUltralight = 'MifareUltralight',
+		MifareIOS = 'mifare',
+	}
+
 	export interface ParseUriResult {
 		uri: string;
 	}
@@ -29,10 +41,10 @@ declare module 'react-native-nfc-manager' {
 	}
 
 	interface RegisterTagEventOpts {
-    invalidateAfterFirstRead?: boolean;
-    isReaderModeEnabled?: boolean;
-    readerModeFlags?: number;
-  }
+		invalidateAfterFirstRead?: boolean;
+		isReaderModeEnabled?: boolean;
+		readerModeFlags?: number;
+	}
 
 	interface NdefWriteOpts {
 		format?: boolean
@@ -58,16 +70,16 @@ declare module 'react-native-nfc-manager' {
 		/** [ANDROID ONLY] */
 		getLaunchTagEvent(): Promise<TagEvent | null>;
 
-		 /**
-     * Start to listen to ANY NFC Tags
-     * @param listener The callback function when a tag is found.
-     * @param alertMessage [iOS ONLY] Message displayed when NFC Scanning popup appears.
-     * @param invalidateAfterFirstRead [iOS ONLY] When set to true, will auto-dismiss the NFC Scanning popup after scanning.
-     */
-    registerTagEvent(
-      listener: (tag: TagEvent) => void,
-      alertMessage?: string,
-      options?: RegisterTagEventOpts,
+		/**
+		* Start to listen to ANY NFC Tags
+		* @param listener The callback function when a tag is found.
+		* @param alertMessage [iOS ONLY] Message displayed when NFC Scanning popup appears.
+		* @param invalidateAfterFirstRead [iOS ONLY] When set to true, will auto-dismiss the NFC Scanning popup after scanning.
+		*/
+		registerTagEvent(
+			listener: (tag: TagEvent) => void,
+			alertMessage?: string,
+			options?: RegisterTagEventOpts,
 		): Promise<any>;
 
 		unregisterTagEvent(): Promise<any>;
@@ -75,7 +87,7 @@ declare module 'react-native-nfc-manager' {
 		cancelNdefWrite(): Promise<any>;
 		requestNdefWrite(bytes: number[], opts?: NdefWriteOpts): Promise<any>;
 		onStateChanged(listener: (event: EventStateChange) => void): Promise<EmitterSubscription>;
-		
+
 		mifareClassicSectorToBlock: (sector: number) => ArrayLike<number>
 		mifareClassicReadBlock: (block: ArrayLike<number>) => ArrayLike<number>
 		mifareClassicWriteBlock: (block: ArrayLike<number>, simpliArr: any[]) => void
@@ -85,6 +97,11 @@ declare module 'react-native-nfc-manager' {
 		getTag: () => void
 		mifareClassicGetSectorCount: () => number
 		mifareClassicAuthenticateA: (sector: number, keys: number[]) => void
+
+		/** [IOS ONLY] */
+		sendMifareCommandIOS: (commands: string) => Promise<any>;
+
+		transceive: (command: string) => Promise<any>;
 	}
 	const nfcManager: NfcManager;
 	export namespace NdefParser {
@@ -96,13 +113,13 @@ declare module 'react-native-nfc-manager' {
 	type URI = string;
 
 	export enum NfcAdapter {
-		FLAG_READER_NFC_A= 0x1,
-		FLAG_READER_NFC_B= 0x2,
-		FLAG_READER_NFC_F= 0x4,
-		FLAG_READER_NFC_V= 0x8,
-		FLAG_READER_NFC_BARCODE= 0x10,
-		FLAG_READER_SKIP_NDEF_CHECK= 0x80,
-		FLAG_READER_NO_PLATFORM_SOUNDS= 0x100,
+		FLAG_READER_NFC_A = 0x1,
+		FLAG_READER_NFC_B = 0x2,
+		FLAG_READER_NFC_F = 0x4,
+		FLAG_READER_NFC_V = 0x8,
+		FLAG_READER_NFC_BARCODE = 0x10,
+		FLAG_READER_SKIP_NDEF_CHECK = 0x80,
+		FLAG_READER_NO_PLATFORM_SOUNDS = 0x100,
 	}
 
 	export const Ndef: {
@@ -114,7 +131,7 @@ declare module 'react-native-nfc-manager' {
 		TNF_UNKNOWN: 0x05,
 		TNF_UNCHANGED: 0x06,
 		TNF_RESERVED: 0x07,
-	
+
 		RTD_TEXT: "T", // [0x54]
 		RTD_URI: "U", // [0x55]
 		RTD_SMART_POSTER: "Sp", // [0x53, 0x70]
@@ -122,7 +139,7 @@ declare module 'react-native-nfc-manager' {
 		RTD_HANDOVER_CARRIER: "Hc", // [0x48, 0x63]
 		RTD_HANDOVER_REQUEST: "Hr", // [0x48, 0x72]
 		RTD_HANDOVER_SELECT: "Hs", // [0x48, 0x73]
-		
+
 		text: {
 			encodePayload: (text: string, lang?: ISOLangCode, encoding?: any) => NdefRecord;
 			decodePayload: (data: Uint8Array) => string;
